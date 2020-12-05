@@ -12,6 +12,9 @@ import org.phypo.PPg.PPgUtils.Log;
 //***********************************
 public class MyRecord {
 
+	protected   long    sCurrentNumOrder=1;
+	protected   long    cNumOrder=1;
+	protected   long    cNumRandom=1;
 	protected   URI     cURI;
 	protected   String  cPath="";
 	protected   String  cName="";
@@ -22,7 +25,8 @@ public class MyRecord {
 	protected   String  cStrError=null;  
 	
 
-
+	public long     getOrder()            { return cNumOrder; }
+	public long     getRandom()           { return cNumRandom; }
 	public String   getUri()              { return cURI.getRawPath();   }
 	public String   getName()             { return cName;   }
 	public String   getPath()             { return cPath;   }
@@ -31,6 +35,7 @@ public class MyRecord {
 	public String   getStrError()         { return cStrError;   }
 	public Player.Error getError()        { return cError;   }
 	public boolean  onError()             { return cError != Player.Error.NO_ERROR;}
+	
 
 	//----------------------------
 	void setError( Player.Error iError, String iStrError ) {
@@ -64,7 +69,11 @@ public class MyRecord {
 	}
 	//----------------------------
 	public MyRecord( File iFile ) { //URI iUri) {
-
+		
+		cNumOrder = sCurrentNumOrder++;
+		cNumRandom = Main.Instance().getRandomLong();
+		
+		
 		cURI = iFile.toURI();
 
 		cName = iFile.getName();

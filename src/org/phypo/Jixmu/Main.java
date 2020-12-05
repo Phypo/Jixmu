@@ -4,6 +4,7 @@ package org.phypo.Jixmu;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Random;
 
 import org.phypo.PPg.PPgFX.AppliFx;
 import org.phypo.PPg.PPgUtils.Log;
@@ -15,6 +16,11 @@ import org.phypo.PPg.PPgUtils.Log;
 public class Main  extends AppliFx {
 
 	static public Main Instance() { return (Main) sInstance; } // hide the mother class fonction
+	
+
+	protected Random cRandom = new Random();
+	public long getRandomLong() { return cRandom.nextLong(); }  
+	
 
 	//-------------------------------------
 	Stage       cStage       = null;
@@ -26,6 +32,7 @@ public class Main  extends AppliFx {
 	
 	//--------------------------------------
 	public void start(final Stage iStage) {
+		init("Jixmu", "0.1", "phypo.org", "2020/12/05", "ppoupon@phypo.org");
 
 		cStage = iStage;
 
@@ -40,8 +47,9 @@ public class Main  extends AppliFx {
 	} 
 	//--------------------------------------
 	public static void main(String[] iArgs){ 
+
 		Log.SetDebug(1);
-		Conf.OpenIni( iArgs );
+		Conf.ReadIni( iArgs );
 		launch( iArgs ); 
 	} 
 } 

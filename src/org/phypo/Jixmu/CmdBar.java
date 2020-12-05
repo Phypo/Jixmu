@@ -15,7 +15,7 @@ import javafx.scene.media.MediaPlayer.Status;
 public class CmdBar extends HBox {
 	
 	
-	Button cPlayButton      = new Button("||");
+	Button cPlayButton      = new Button(">");
 	Button cPreviousButton  = new Button("|<<"); 
 	Button cNextButton      = new Button(">>|"); 
 	Label  cInfoMedia       = new Label("");
@@ -53,12 +53,12 @@ public class CmdBar extends HBox {
 		cInfoMedia.setMinWidth(200 );
 		
 
-		cPlayButton.setOnAction(new EventHandler<ActionEvent>() { 
-			public void handle(ActionEvent e) 
-			{ 
+		cPlayButton.setOnAction( (ActionEvent e)-> { 
 				MediaPlayer lPM = cPlayer.getPlayer();
-				if(  lPM == null )
+				if(  lPM == null ) {
+					cPlayer.next();
 					return;
+				}
 				
 				Status status = lPM.getStatus(); // To get the status of Player 
 				if (status == status.PLAYING) { 
@@ -73,13 +73,11 @@ public class CmdBar extends HBox {
 
 					//	cPlayButton.setText(">"); 
 					} 
-				} // If the video is stopped, halted or paused 
+				} // If stopped, halted or paused 
 				if (status == Status.HALTED || status == Status.STOPPED || status == Status.PAUSED) { 
 					lPM.play(); 
 					cPlayButton.setText("||"); 
-				} 
-			} 
-		}); 		
+				}}); 				
 	}
 	//-------------------------------------------------------
 	void setInfo( String iInfo ) { cInfoMedia.setText( iInfo );	}

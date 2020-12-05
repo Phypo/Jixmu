@@ -1,8 +1,10 @@
 package org.phypo.Jixmu;
 
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.util.Random;
 
@@ -39,7 +41,8 @@ public class Main  extends AppliFx {
 		//	cPlayer = new Player("file:///home/phipo/Musique/MariSamuelsen–MaxRichter-November-LiveFromTheForbiddenCity_2018.mp3");		
 		cPlayer    = new Player(); 
 		cPrimScene = new Scene(cPlayer );  
-
+		
+		iStage.setOnCloseRequest( (WindowEvent iEv) -> {cPlayer.quit();});
 		
 		cStage.setScene(cPrimScene);
 		cStage.show();

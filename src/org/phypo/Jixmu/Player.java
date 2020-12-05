@@ -33,6 +33,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 // player into regions 
 { 
 	static File sDir = new File( "/home/phipo/Musique");
+	//--------------------------------------
 
 	FileChooser      cFileChooser = null; 
 	DirectoryChooser cDirChooser = null; 
@@ -141,9 +142,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 		FxHelper.AddMenuSeparator( lMenuFile);
 		//===================
 		FxHelper.AddMenuItem(lMenuFile, "Quit", (ActionEvent)->{ 
-			cTableRecords.save();				
-			Conf.SaveIni();
-			System.exit(0);					
+			quit();
 		});	
 
 		// --=== Util ===--
@@ -167,8 +166,16 @@ public class Player extends BorderPane // Player class extend BorderPane
 		FxHelper.AddMenuItem( lMenuView, "Records", (ActionEvent e) -> {
 			if( cTableRecords.isVisible() ) {
 				cTableRecords.setVisible(false);
+				//setCenter(null);
+				getTop().setManaged(false);
+				cTableRecords.setManaged(false);
+		//		Main.Instance().cStage.sizeToScene();
 			} else {
 				cTableRecords.setVisible(true);					
+				cTableRecords.setManaged(true);
+				getTop().setManaged(true);
+		//		Main.Instance().cStage.sizeToScene();
+			//setCenter( cTableRecords );
 			}
 		});
 
@@ -184,7 +191,6 @@ public class Player extends BorderPane // Player class extend BorderPane
 		// ==== Menu =====
 
 
-		// ======== Find media to play ===============
 
 		cMedBar = new MediaBar(this);
 		cCmdBar = new CmdBar(this);
@@ -199,6 +205,12 @@ public class Player extends BorderPane // Player class extend BorderPane
 	}
 	//--------------------------------------
 	//--------------------------------------
+	//--------------------------------------
+	void quit() {
+		cTableRecords.save();				
+		Conf.SaveIni();
+		Platform.exit(); //	System.exit(0);			
+	}
 	//--------------------------------------
 	void setVolume(double iVol) {
 		if( iVol < 0 ) iVol = 0;

@@ -9,13 +9,13 @@ JAVA_CLASS=$(notdir  $(patsubst %.java, %.class,  $(JAVA_FILES) ) )
 
 
 
-NAME=JizMapFX
-PACK=com/sesame_it/JizMapFX
+NAME=Jixmu
+PACK=org/phypo/Jixmu
 ROOT=../../..
 JAR_PATH=../../../../../Bin
+JAR_INSTALL=../../../../../Bin/jixmu
 
 
-MARIADB_JAR=${JAR_PATH}/mariadb-java-client-2.7.0.jar
 PPG_JAR=${JAR_PATH}/PPgLib.jar
 
 
@@ -30,16 +30,19 @@ jar::
 
 
 install::
-	cp -p ${NAME}.jar     ${JAR_PATH}; \
-	cp -rp ${ROOT}/../Resources  ${JAR_PATH}; \
-	cp -rp ${ROOT}/../Scripts/*  ${JAR_PATH}; \
+	mkdir -p ${JAR_INSTALL}; \
+	cp ${JAR_PATH}/PPgLib.jar ${JAR_INSTALL};\
+	cp -p ${NAME}.jar     ${JAR_INSTALL}; \
+	cp -rp ${ROOT}/../Resources  ${JAR_INSTALL}; \
+	cp -rp ${ROOT}/../Scripts/*  ${JAR_INSTALL}; \
 
 
 clean::
 	rm -f *.class *.jar
 
 
+
 %.class: %.java
-	javac    --module-path ${PATH_TO_FX} --add-modules javafx.controls,javafx.fxml  -classpath ${ROOT}:${MARIADB_JAR}:${PPG_JAR}  -deprecation -g  $*.java
+	javac     --module-path ${PATH_TO_FX}  --add-modules javafx.controls,javafx.fxml,javafx.swing,javafx.graphics,javafx.fxml,javafx.media,javafx.web --add-exports javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAME --add-reads javafx.graphics=ALL-UNNAMED --add-opens javafx.controls/com.sun.javafx.charts=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.iio=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.iio.common=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.css=ALL-UNNAMED --add-opens javafx.base/com.sun.javafx.runtime=ALL-UNNAMED   -classpath ${ROOT}:${PPG_JAR}  -deprecation -g  $*.java
 
 

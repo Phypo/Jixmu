@@ -12,7 +12,8 @@ import org.phypo.PPg.PPgUtils.Log;
 //***********************************
 public class MyRecord {
 
-	protected   long    sCurrentNumOrder=1;
+	static protected   long    sCurrentNumOrder=1;
+	
 	protected   long    cNumOrder=1;
 	protected   long    cNumRandom=1;
 	protected   URI     cURI;
@@ -68,10 +69,13 @@ public class MyRecord {
 			}
 	}
 	//----------------------------
+	void randomize() { cNumRandom = Main.Instance().getRandomLong();}
+
+	//----------------------------
 	public MyRecord( File iFile ) { //URI iUri) {
 		
 		cNumOrder = sCurrentNumOrder++;
-		cNumRandom = Main.Instance().getRandomLong();
+		randomize();
 		
 		
 		cURI = iFile.toURI();
@@ -91,7 +95,7 @@ public class MyRecord {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Log.Dbg( "MyRecord URI:" + cURI) ;
+		Log.Dbg2( "MyRecord URI:" + cURI) ;
 	}	  
 	//----------------------------
 

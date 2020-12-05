@@ -41,16 +41,17 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	public HashMap<String,MyRecord>   cRecords = new HashMap<>();
 	public TreeMap<Long,MyRecord>     cRandoms = new TreeMap<>();
 	//--------------------------------------------
-	int      cCurrentRecordPos = -1;
+	//int      cCurrentRecordPos = -1;
 	MyRecord cCurrentRecord = null;
 
 	//-----------------------------
 	@Override
 	public MyRecord addLine( MyRecord iObj ) {
-
-		MyRecord lTmp = cRecords.get(iObj);
-		if( lTmp != null) return lTmp;
-		cRecords.put( iObj.getPath(), iObj );
+		
+		if( cRecords.containsKey( iObj.getPath()))
+				return null;
+				
+		cRecords.put( iObj.getPath(), iObj );			
 		cRandoms.put( iObj.getRandom(), iObj);
 		super.addLine(iObj);
 		return iObj;
@@ -61,7 +62,6 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		cRecords.clear();
 		cRandoms.clear();
 		cCurrentRecord = null;
-		cCurrentRecordPos = -1;
 		save();
 	}
 	//-----------------------------
@@ -83,15 +83,23 @@ public class TableRecords  extends  TableFX<MyRecord>{
 			}
 		}
 
-		cCurrentRecord    = iRecord;
-		cCurrentRecordPos = iPosItem;
+		cCurrentRecord = iRecord;
 		clearAndSelect( iPosItem);
+		scrollToIndex( iPosItem);
 		return cCurrentRecord;
 	}
 	//-----------------------------
+	void randomize() {
+		cRandoms.clear();
+		for( MyRecord lRec : getContainer() ) {
+			lRec.randomize();
+			cRandoms.put( lRec.getRandom(), lRec);
+		}
+	}	
+	//-----------------------------
 	// calling by double-click
 	MyRecord setCurrentRecord( MyRecord iRecord ) {
-		return setCurrentRecord( iRecord,getIndexOf( iRecord) );
+		return setCurrentRecord( iRecord, getIndexOf( iRecord) );
 	}
 	//--------------------------------------------
 	MyRecord setCurrentRecord(  String iStr) {
@@ -99,18 +107,35 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		return setCurrentRecord( lRecord );		
 	}
 	//--------------------------------------------
-	MyRecord getNextRecord() {
-
+	MyRecord getNextRecord(boolean oReturnFlagStop) {
+		oReturnFlagStop =false;
+		
 		if( cCurrentRecord == null ) {
 			return setCurrentRecord( null, -1 );
 		}
-		
+		Log.Dbg( "getNextRecord Conf.sRandom:"  + Conf.sRandom );
+	
 		if( Conf.sRandom == false ) {
-			cCurrentRecordPos = getIndexOf( cCurrentRecord); // il peut y avoir eu des sorts ou autre //Lent?
-			return setCurrentRecord( getItem( cCurrentRecordPos+1 ), cCurrentRecordPos+1 );
+			Log.Dbg( "getNextRecord sequential");
+			int lCurrentRecordPos = getIndexOf( cCurrentRecord); // il peut y avoir eu des sorts ou autre //Lent?
+			MyRecord lRecord = getItem( lCurrentRecordPos+1 );
+			if( lRecord == null ) {
+				oReturnFlagStop = true; 
+			}
+		return setCurrentRecord( lRecord, lCurrentRecordPos+1);
 		}
 		
-		Map.Entry<Long,MyRecord> cRandoms.higherEntry( cCurrentRecord.getRandom() );
+		Log.Dbg( "getNextRecord random");
+		Map.Entry<Long,MyRecord> lEntry = cRandoms.higherEntry( cCurrentRecord.getRandom() );
+		
+		if( lEntry == null ) {
+			oReturnFlagStop = true; 
+			lEntry = cRandoms.firstEntry();
+			if( lEntry == null ) {			
+				return setCurrentRecord( null, -1 );
+			}
+		}
+		return  setCurrentRecord( lEntry.getValue());
 	}
 	//--------------------------------------------
 	MyRecord getPreviousRecord() {
@@ -119,11 +144,28 @@ public class TableRecords  extends  TableFX<MyRecord>{
 			return setCurrentRecord( null, -1 );
 		}
 
+		Log.Dbg( "getPreviousRecord Conf.sRandom:"  + Conf.sRandom );
+		
 		if( Conf.sRandom == false ) {
-			cCurrentRecordPos = getIndexOf( cCurrentRecord); // il peut y avoir eu des sorts ou autre //Lent?
-			return setCurrentRecord( getItem( cCurrentRecordPos-1 ), cCurrentRecordPos-1 );
+			Log.Dbg( "getPreviousRecord sequential");
+			int lCurrentRecordPos = getIndexOf( cCurrentRecord); // il peut y avoir eu des sorts ou autre //Lent?
+			MyRecord lRecord = getItem( lCurrentRecordPos-1 );
+			if( lRecord == null ) {
+				lRecord = getItem( size()-1 ); // la fin
+			}
+			return setCurrentRecord( lRecord, lCurrentRecordPos-1);
 		} 
-		Map.Entry<Long,MyRecord> cRandoms.leatherEntry(cCurrentRecord.getRandom());
+		Log.Dbg( "getPreviousRecord random");
+		Map.Entry<Long,MyRecord> lEntry = cRandoms.lowerEntry(cCurrentRecord.getRandom());
+		
+		if( lEntry == null ) {			
+			lEntry = cRandoms.lastEntry();// la fin
+			if( lEntry == null ) {			
+				return setCurrentRecord( null, -1 );
+			}
+		}
+		
+		return setCurrentRecord( lEntry.getValue());
 	}
 	//--------------------------------------------
 	public TableRecords( Player iPlayer ) {
@@ -134,14 +176,14 @@ public class TableRecords  extends  TableFX<MyRecord>{
 
 		TableColumn<MyRecord,String>     lColStr ;
 
+		lColStr = addColumn( "Order",        "Order");	
 		lColStr = addColumn( "Name",         "Name");		
 		lColStr = addColumn( "Size",         "Size");	
-		lColStr = addColumn( "Order",        "Order");	
-		lColStr = addColumn( "Random",       "Random");	
 		lColStr = addColumn( "Extension",    "Extension");		
-		lColStr = addColumn( "Error",        "StrError");		
+		//lColStr = addColumn( "Random",       "Random");	
 		lColStr = addColumn( "Path",         "Path");		
-		lColStr = addColumn( "Information",  "Info");		
+//		lColStr = addColumn( "Information",  "Info");		
+		lColStr = addColumn( "Error",        "StrError");		
 
 
 		setOnDragOver( (DragEvent iEv) -> {
@@ -195,7 +237,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 
 
 		String lName = iFile.getPath();
-		Log.Dbg( "TableRecords addFile path:" +  lName );
+		Log.Dbg2( "TableRecords addFile path:" +  lName );
 
 		int lIndex = lName.lastIndexOf('.');
 		if( lIndex <= 0 ) return null;		
@@ -212,9 +254,6 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		MyRecord lRecord = new MyRecord( iFile );
 		addLine( lRecord);	
 
-		if( cCurrentRecordPos == -1 ) {
-			cCurrentRecordPos = 0;
-		}
 		return lRecord;
 	}
 	/*
@@ -237,7 +276,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		return true;
 	}
 	//-----------------------------
-	public void doubleClick( MouseEvent iEv, McRandomsyRecord iRecord, int iPosItem  ) {
+	public void doubleClick( MouseEvent iEv, MyRecord iRecord, int iPosItem  ) {
 		if( setCurrentRecord( iRecord, iPosItem) != null )
 			cPlayer.play(iRecord, 0);
 	}
@@ -316,29 +355,29 @@ public class TableRecords  extends  TableFX<MyRecord>{
 			String  lSection="";
 			boolean lHeader=true;
 			while( (lStr =lBufread.readLine()) != null) {
-				Log.Dbg( "TableRecords read - readline:" + lStr);
+				Log.Dbg2( "TableRecords read - readline:" + lStr);
 				
 				if( lHeader ) {
 					if( lStr.charAt(0) == '[' ) {
 						lSection = lStr;				
-						Log.Dbg( "TableRecords read - Section:" + lSection );
+						Log.Dbg2( "TableRecords read - Section:" + lSection );
 					}
 					else {
 						if( lSection.equals(sPlayListSectionTag )) {	
-							Log.Dbg("TableRecords read - Read Section  Playlist");
+							Log.Dbg2("TableRecords read - Read Section  Playlist");
 							if( lStr.equals( sFilesTag)){
 								lHeader = false;
-								Log.Dbg( "TableRecords read - Header end");
+								Log.Dbg2( "TableRecords read - Header end");
 							}
 							else if( lStr.startsWith( sCurrentTag )) {
 								lCurrent = lStr.substring(sCurrentTag.length());							
-								Log.Dbg( "TableRecords read - Current :"+lCurrent);
+								Log.Dbg2( "TableRecords read - Current :"+lCurrent);
 							}
 						}
 					}
 				}
 				else {
-					Log.Dbg("TableRecords read - Adding file:" + lStr );
+					Log.Dbg2("TableRecords read - Adding file:" + lStr );
 					addFile( lStr);
 				}
 			}

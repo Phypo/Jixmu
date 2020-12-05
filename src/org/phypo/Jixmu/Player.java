@@ -146,8 +146,22 @@ public class Player extends BorderPane // Player class extend BorderPane
 			System.exit(0);					
 		});	
 
+		// --=== Util ===--
+		Menu     lMenuUtil= new Menu("Util");
+		cMenu.getMenus().add(lMenuUtil); 
+
+		FxHelper.AddMenuItem( lMenuUtil, "new Randomize", (ActionEvent e) -> {
+			cTableRecords.randomize(); 								
+		});
+
+		cTableRecords = new TableRecords(this);
+		cTableRecords.setVisible(true);					
+		setCenter( cTableRecords );
+
+
+		cTableRecords.load();
 		// --=== VIEW ===--
-		Menu     lMenuView= new Menu("View");
+		Menu lMenuView= new Menu("View");
 		cMenu.getMenus().add(lMenuView); 
 
 		FxHelper.AddMenuItem( lMenuView, "Records", (ActionEvent e) -> {
@@ -275,8 +289,8 @@ public class Player extends BorderPane // Player class extend BorderPane
 	}
 	//--------------------------------------
 	public void play( MyRecord iRecord, double iPos ) {
+	
 		if( iRecord == null ) {
-			next();
 			return;
 		} 
 
@@ -376,6 +390,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 	}
 	//--------------------------------------	
 	public void play() {
+		
 		if( cMedPlayer != null ) {			
 			cMedPlayer.play();
 			cCmdBar.play();
@@ -384,34 +399,36 @@ public class Player extends BorderPane // Player class extend BorderPane
 		}
 	}
 	//--------------------------------------	
-	public void next() {		
-		MyRecord lRecord = null;
+	public void next() {	
 		
-		for( int i=0; i< 100; i++) { // en cas d'eereur on essaye 100 x
-				lRecord = cTableRecords.getNextRecord();
-			} 			
-			if( lRecord != null && lRecord.onError() == false) {
+		boolean oFlagStop = false;
+		MyRecord lRecord = null;		
+		lRecord = cTableRecords.getNextRecord(oFlagStop);		
+
+		if( Conf.sRepeatAll == false  && oFlagStop == true)
+			return ;
+		
+		if( lRecord != null && lRecord.onError() == false ) {
 				play( lRecord, 0 );
 				return;
-			}
-			else {
-				next();
-			}
+		}
+//		else {
+	//		next();
+	//	}
 	}
 	//--------------------------------------	
 	public void previous() {
 		MyRecord lRecord = null;
 
-		for( int i=0; i< 100; i++) {
-				lRecord = cTableRecords.getPreviousRecord();
-			}
+		lRecord = cTableRecords.getPreviousRecord();
+			
 		if( lRecord != null && lRecord.onError() == false) {
 				play( lRecord, 0 );
 				return;
 			}
-		else {
-			previous();
-		}
+	//	else {
+	//		previous();
+	//	}
 	}
 	//--------------------------------------	
 	public void endOfTrack() {

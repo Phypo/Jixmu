@@ -71,34 +71,27 @@ public class MediaBar extends HBox {
 		ToggleButton lToggleM = FxHelper.CreateToggle( "", "Mute", Conf.sIconeMute );
 		lToggleM.setSelected(Conf.sMute);
 		lToggleM.setOnAction( (ActionEvent e)->{
-			Log.Dbg( "Toggle Mute" + lToggleM.isSelected() );	
-	        System.out.println(lToggleM.getText() + " - Selected: " + lToggleM.isSelected() 
-	            + "; UserData: " + lToggleM.getUserData());
 	        Conf.sMute = lToggleM.isSelected();	
-	        Conf.SaveIni();
+			Log.Dbg( "Toggle Mute" + lToggleM.isSelected() + Conf.sMute);	
 	        cPlayer.mute();
 	        Conf.SaveIni();
-					});
+		});
 		
 		ToggleButton lToggleR = FxHelper.CreateToggle( "",  "Repeat all",  Conf.sIconeRepeatAll );
 		lToggleR.setSelected(Conf.sRepeatAll);
 		lToggleR.setOnAction( (ActionEvent e)->{
-			Log.Dbg( "Toggle Repeat" + lToggleR.isSelected() );	
-	        System.out.println(lToggleR.getText() + " - Selected: " + lToggleR.isSelected() 
-	            + "; UserData: " + lToggleR.getUserData());
 	        Conf.sRepeatAll = lToggleR.isSelected();	
+			Log.Dbg( "Toggle Repeat" + lToggleR.isSelected() + Conf.sRepeatAll);	
 	        Conf.SaveIni();
-	});
+		});
 		
 		ToggleButton lToggleA = FxHelper.CreateToggle( "",  "Random",  Conf.sIconeRandom );
 		lToggleA.setSelected(Conf.sRandom );
 		lToggleA.setOnAction( (ActionEvent e)->{
-			Log.Dbg( "Toggle random" + lToggleA.isSelected() );	
-	        System.out.println(lToggleA.getText() + " - Selected: " + lToggleA.isSelected() 
-	            + "; UserData: " + lToggleA.getUserData());
-	        Conf.sRandom = lToggleA.isSelected();	
+	        Conf.sRandom = lToggleA.isSelected();		        
+	        Log.Dbg( "Toggle random" + lToggleA.isSelected() + " " +  Conf.sRandom );	
 	        Conf.SaveIni();
-			});
+		});
 		
 		setAlignment(Pos.CENTER);
 
@@ -135,7 +128,7 @@ public class MediaBar extends HBox {
 						double lCurrent = lPM.getCurrentTime().toMillis();
 						double lTotal   = lPM.getTotalDuration().toMillis();
 						double lPosition = (lCurrent / lTotal) * 100.0;
-						Log.Dbg( "updatesValues " + lTotal + " " + lCurrent + "->"+ lPosition);
+	//					Log.Dbg( "updatesValues " + lTotal + " " + lCurrent + "->"+ lPosition);
 						
 						cSliderTime.setValue(  lPosition );
 						Conf.sCurrentMediaTime = lCurrent;

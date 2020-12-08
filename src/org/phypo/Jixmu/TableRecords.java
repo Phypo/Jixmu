@@ -256,6 +256,16 @@ public class TableRecords  extends  TableFX<MyRecord>{
 
 		return lRecord;
 	}
+	//--------------------------------------------
+	
+	public void removeRecord( MyRecord lRecord, boolean iFlagAlsoLine ){		
+		cRecords.remove( lRecord.getPath() );
+		cRandoms.remove(lRecord.getRandom() );
+		if( iFlagAlsoLine) {
+			removeObject( lRecord);
+		}
+		Log.Dbg( "lines:" + size() + " Records:" + cRecords.size()+ "Randoms:" + cRandoms.size());
+	}
 	/*
 	//--------------------------------------------
 	public void setRecordsMap( MyRecordMap iMap  ) {
@@ -267,10 +277,12 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	public boolean addPopupMenuItems( ContextMenu iMenu, MouseEvent iEv) {
 		FxHelper.AddMenuItem( iMenu, "Remove selection", ( ActionEvent iAEv) -> {		
 
-				MyRecord lFind = removeSelectedLineObject();
-				if( lFind != null ) {
-					Log.Dbg( "addPopupMenuItems Remove line :" + lFind.getPath() );
-					cRecords.remove( lFind.getPath() );
+				List<MyRecord> lList = removeAndGetAllSelectedLines();
+				for( MyRecord lFind : lList ) {
+					if( lFind != null ) {
+						Log.Dbg( "addPopupMenuItems Remove line :" + lFind.getPath() );
+						removeRecord(  lFind, false );
+					}
 				}
 		});
 		return true;

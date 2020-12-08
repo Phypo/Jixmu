@@ -103,7 +103,7 @@ public class MediaBar extends HBox {
 		cSliderVolume.setValue( cPlayer.getVolume() );
 		cSliderBalance.setValue(cPlayer.getBalance());
 
-		cSliderVolume.setPrefWidth(70); 
+		cSliderVolume.setPrefWidth(100); 
 		cSliderVolume.setMinWidth(30); 
 		
 		cSliderBalance.setPrefWidth(70); 

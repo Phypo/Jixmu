@@ -4,8 +4,6 @@ import org.phypo.PPg.PPgFX.FxHelper;
 import org.phypo.PPg.PPgUtils.*;
 
 import javafx.scene.image.Image;
-import javafx.util.Duration;
-
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +28,7 @@ class Conf{
 	public static Image sIconeRepeatAll  = null;
 	public static Image sIconeRandom     = null;
 	public static Image sIconeMute       = null;
-
+	public static Image sIconeDestroy    = null;
 	static String sGoodExtensions ="mp3 mp4";
 	
 	static Set<String> sSetGoodExtensions = new HashSet<>();
@@ -94,12 +92,12 @@ class Conf{
 		
 		if( OpenIni( args ) == false ) return false;
 
-	//	sIconeAppli     = FxHelper.ReadIcon(  sIniConf, "Application", "Icon",          null );	
+		sIconeAppli     = FxHelper.ReadIcon(  sIniConf, "Application", "Icon",          null );	
 		sIconeRepeatAll = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconRepeatAll", null );	
 		sIconeRandom    = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconRandom",    null );	
 		sIconeMute      = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconMute",      null );	
 
-		
+		sIconeDestroy= FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconDestroy",      null );	
 		
 		sAutoPlay  = sIniConf.getboolean( "USER_SETTINGS", "AutoPlay",  sAutoPlay);
 		sRandom    = sIniConf.getboolean( "USER_SETTINGS", "Random",    sRandom);

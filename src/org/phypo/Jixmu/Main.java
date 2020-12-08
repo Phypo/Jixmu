@@ -1,7 +1,6 @@
 package org.phypo.Jixmu;
 
 
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -9,6 +8,7 @@ import javafx.stage.WindowEvent;
 import java.util.Random;
 
 import org.phypo.PPg.PPgFX.AppliFx;
+import org.phypo.PPg.PPgFX.FxHelper;
 import org.phypo.PPg.PPgUtils.Log;
 
 
@@ -43,6 +43,8 @@ public class Main  extends AppliFx {
 		cPrimScene = new Scene(cPlayer );  
 		
 		iStage.setOnCloseRequest( (WindowEvent iEv) -> {cPlayer.quit();});
+		
+		FxHelper.SetStageIcon( cStage, Conf.sIconeAppli );
 		
 		cStage.setScene(cPrimScene);
 		cStage.show();

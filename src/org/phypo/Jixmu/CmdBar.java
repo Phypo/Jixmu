@@ -5,6 +5,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
+import org.phypo.PPg.PPgFX.FxHelper;
+
 import javafx.event.ActionEvent; 
 import javafx.event.EventHandler; 
 import javafx.geometry.Pos; 
@@ -18,7 +20,8 @@ public class CmdBar extends HBox {
 	Button cPlayButton      = new Button(">");
 	Button cPreviousButton  = new Button("|<<"); 
 	Button cNextButton      = new Button(">>|"); 
-	Label  cInfoMedia       = new Label("");
+	Button cDestroyButton   = new Button(""); 
+	Button cInfoMedia       = new Button("");
 
 	
 	Player cPlayer = null;
@@ -28,29 +31,28 @@ public class CmdBar extends HBox {
 	public CmdBar( Player iPlayer  ) {
 		cPlayer = iPlayer;
 		
-		getChildren().addAll(  cPreviousButton, cPlayButton, cNextButton, cInfoMedia );
+		getChildren().addAll(  cPreviousButton, cPlayButton, cNextButton, cDestroyButton, cInfoMedia );
 		
 		cPlayButton.setPrefWidth(40); 
 		cPlayButton.setMinWidth(40); 
 
 		cPreviousButton.setPrefWidth(60); 
 		cPreviousButton.setMinWidth(50); 
-		cPreviousButton.setOnAction(new EventHandler<ActionEvent>() { 
-			public void handle(ActionEvent e) {
-				cPlayer.previous();
-			} 
-		}); 								
+		cPreviousButton.setOnAction((ActionEvent e) -> { cPlayer.previous(); }); 								
 		
 		cNextButton.setPrefWidth(60); 
 		cNextButton.setMinWidth(50); 
-		cNextButton.setOnAction(new EventHandler<ActionEvent>() { 
-			public void handle(ActionEvent e) {
-				cPlayer.next();
-			} 
-		}); 								
+		cNextButton.setOnAction( (ActionEvent e) -> { cPlayer.next(); }); 								
+		cDestroyButton.setPrefWidth(60); 
+		cDestroyButton.setMinWidth(50); 
+		FxHelper.SetButtonImage( cDestroyButton, Conf.sIconeDestroy );
+		
+		cDestroyButton.setOnAction( (ActionEvent e) -> { cPlayer.destroyCurrent(); }); 								
 		
 		cInfoMedia.setPrefWidth(800); 
 		cInfoMedia.setMinWidth(200 );
+		cInfoMedia.setOnAction( (ActionEvent e) -> {cPlayer.scrollToCurrent();	}); 	
+		
 		
 
 		cPlayButton.setOnAction( (ActionEvent e)-> { 

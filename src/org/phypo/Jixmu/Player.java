@@ -35,9 +35,10 @@ public class Player extends BorderPane // Player class extend BorderPane
 	static File sDir = new File( "/home/phipo/Musique");
 	//--------------------------------------
 
-	FileChooser      cFileChooser = null; 
-	DirectoryChooser cDirChooser = null; 
-
+	FileChooser      cFileChooser     = null; 
+	DirectoryChooser cDirChooser      = null; 
+	String           cCurrentPlayList = "Default.jixmu";
+	
 	public enum Error { NO_ERROR, MEDIAPLAYER, MALFORMED_URL, MEDIA_UNSUPPORTED, MEDIA_ERROR};
 
 
@@ -112,7 +113,10 @@ public class Player extends BorderPane // Player class extend BorderPane
 
 		FxHelper.AddMenuSeparator( lMenuFile);
 		//===================
-		FxHelper.AddMenuItem( lMenuFile,"Save playlist ...", (ActionEvent e) ->{ 
+		FxHelper.AddMenuItem( lMenuFile,"Save playlist", (ActionEvent e) ->{ 
+			cTableRecords.writePlaylist( cCurrentPlayList, false);
+		});
+		FxHelper.AddMenuItem( lMenuFile,"Save playlist As ...", (ActionEvent e) ->{ 
 			cFileChooser = new FileChooser();
 			cFileChooser.setInitialDirectory(sDir);
 			cFileChooser.setTitle( "Save playlist");
@@ -135,6 +139,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 				}
 				lName += ".jixmu";
 				cTableRecords.writePlaylist( lName, false);
+				cCurrentPlayList = lName;
 			}	
 		});	
 		//===================
@@ -387,6 +392,17 @@ public class Player extends BorderPane // Player class extend BorderPane
 
 		cMedPlayer.play();
 	} 
+	//--------------------------------------	
+	public void destroyCurrent() {
+		cTableRecords.removeRecord( cTableRecords.getCurrentRecord(), true);
+		next();
+		cTableRecords.writePlaylist( cCurrentPlayList, false);
+	}
+	//--------------------------------------	
+	public void scrollToCurrent() {
+		cTableRecords.scrollToItem( cTableRecords.getCurrentRecord());
+		
+	}
 	//--------------------------------------	
 	public void mute() {
 		if( cMedPlayer != null ) {			

@@ -2,13 +2,13 @@ package org.phypo.Jixmu;
 
 
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 import org.phypo.PPg.PPgFX.FxHelper;
 
 import javafx.event.ActionEvent; 
-import javafx.event.EventHandler; 
 import javafx.geometry.Pos; 
 import javafx.scene.media.MediaPlayer; 
 import javafx.scene.media.MediaPlayer.Status; 
@@ -31,7 +31,7 @@ public class CmdBar extends HBox {
 	public CmdBar( Player iPlayer  ) {
 		cPlayer = iPlayer;
 		
-		getChildren().addAll(  cPreviousButton, cPlayButton, cNextButton, cDestroyButton, cInfoMedia );
+		getChildren().addAll(  cPreviousButton, cPlayButton, cNextButton, cInfoMedia, cDestroyButton );
 		
 		cPlayButton.setPrefWidth(40); 
 		cPlayButton.setMinWidth(40); 
@@ -42,11 +42,12 @@ public class CmdBar extends HBox {
 		
 		cNextButton.setPrefWidth(60); 
 		cNextButton.setMinWidth(50); 
-		cNextButton.setOnAction( (ActionEvent e) -> { cPlayer.next(); }); 								
+		cNextButton.setOnAction( (ActionEvent e) -> { cPlayer.next(); }); 		
+		
+		
 		cDestroyButton.setPrefWidth(60); 
 		cDestroyButton.setMinWidth(50); 
 		FxHelper.SetButtonImage( cDestroyButton, Conf.sIconeDestroy );
-		
 		cDestroyButton.setOnAction( (ActionEvent e) -> { cPlayer.destroyCurrent(); }); 								
 		
 		cInfoMedia.setPrefWidth(800); 
@@ -82,7 +83,7 @@ public class CmdBar extends HBox {
 				}}); 				
 	}
 	//-------------------------------------------------------
-	void setInfo( String iInfo ) { cInfoMedia.setText( iInfo );	}
+	void setInfo( String iInfo ) { cInfoMedia.setText( iInfo );	}	
 	void play()  { cPlayButton.setText("||"); }
 	void pause() { cPlayButton.setText(">"); }
 

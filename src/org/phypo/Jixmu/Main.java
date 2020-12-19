@@ -44,7 +44,7 @@ public class Main  extends AppliFx {
 		
 		iStage.setOnCloseRequest( (WindowEvent iEv) -> {cPlayer.quit();});
 		
-		FxHelper.SetStageIcon( cStage, Conf.sIconeAppli );
+		FxHelper.SetIcon( cStage, Conf.sIconeAppli );
 		
 		cStage.setScene(cPrimScene);
 		cStage.show();

@@ -13,7 +13,7 @@ import org.phypo.PPg.PPgUtils.Log;
 public class MyRecord {
 
 	static protected   long    sCurrentNumOrder=1;
-	
+
 	protected   long    cNumOrder=1;
 	protected   long    cNumRandom=1;
 	protected   URI     cURI;
@@ -24,7 +24,7 @@ public class MyRecord {
 	protected   String  cExtension="";
 	protected   Player.Error cError= Player.Error.NO_ERROR;
 	protected   String  cStrError=null;  
-	
+
 
 	public long     getOrder()            { return cNumOrder; }
 	public long     getRandom()           { return cNumRandom; }
@@ -36,7 +36,7 @@ public class MyRecord {
 	public String   getStrError()         { return cStrError;   }
 	public Player.Error getError()        { return cError;   }
 	public boolean  onError()             { return cError != Player.Error.NO_ERROR;}
-	
+
 
 	//----------------------------
 	void setError( Player.Error iError, String iStrError ) {
@@ -45,39 +45,48 @@ public class MyRecord {
 	}
 	//----------------------------
 	public String getSize() {
-		
+
 		if(cSize < 1000 ){
 			return "o "+cSize ;
 		}
 		else
-		if(cSize < 1000000 ){
-			long lSize =  cSize/(100);
-			float  lSizeF = (float) ((lSize)/10.0);
-			return "ko "+lSizeF ;
-		}
-		else 
-			if(cSize < 1000000000 ){
-				long lSize =  cSize/(100*1000);
+			if(cSize < 1000000 ){
+				long lSize =  cSize/(100);
 				float  lSizeF = (float) ((lSize)/10.0);
-				return "_Mo "+lSizeF ;
+				return "ko "+lSizeF ;
 			}
 			else 
-			{
-				long lSize =  cSize/(100*1000*1000);
-				float  lSizeF = (float) ((lSize)/10.0);
-				return "_Go "+lSizeF;
-			}
+				if(cSize < 1000000000 ){
+					long lSize =  cSize/(100*1000);
+					float  lSizeF = (float) ((lSize)/10.0);
+					return "_Mo "+lSizeF ;
+				}
+				else 
+				{
+					long lSize =  cSize/(100*1000*1000);
+					float  lSizeF = (float) ((lSize)/10.0);
+					return "_Go "+lSizeF;
+				}
 	}
 	//----------------------------
 	void randomize() { cNumRandom = Main.Instance().getRandomLong();}
 
 	//----------------------------
 	public MyRecord( File iFile ) { //URI iUri) {
-		
+		this( iFile, 0);	
+	}	
+	//----------------------------
+	public MyRecord( File iFile, long iRandom  ) { //URI iUri) {
+
+		if( iRandom == 0) {
+			randomize();
+		} else {
+			cNumRandom = iRandom;
+		}
+
 		cNumOrder = sCurrentNumOrder++;
-		randomize();
-		
-		
+
+
 		cURI = iFile.toURI();
 
 		cName = iFile.getName();
@@ -97,6 +106,7 @@ public class MyRecord {
 		}
 		Log.Dbg2( "MyRecord URI:" + cURI) ;
 	}	  
+
 	//----------------------------
 
 }

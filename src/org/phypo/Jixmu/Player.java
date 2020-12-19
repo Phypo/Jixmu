@@ -12,12 +12,15 @@ import org.phypo.PPg.PPgFX.FxHelper;
 import org.phypo.PPg.PPgUtils.Log;
 
 import javafx.scene.control.MenuBar;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane; 
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.application.Platform;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -25,7 +28,6 @@ import javafx.scene.control.Menu;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.util.Duration;
 
 //**********************************************************
 public class Player extends BorderPane // Player class extend BorderPane 
@@ -47,6 +49,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 	MenuBar     cMenu    = null; 
 
 	MediaBar    cMedBar     = null;
+	InfoBar     cInfoBar    = null;
 	CmdBar      cCmdBar     = null;
 
 	Media       cMedia   = null; 
@@ -63,8 +66,6 @@ public class Player extends BorderPane // Player class extend BorderPane
 
 
 	public MediaPlayer getPlayer() { return cMedPlayer;} 
-
-	MyRecordMap  cRecords = new MyRecordMap();
 
 	int cCurrentRecordPos = 0;
 
@@ -197,9 +198,10 @@ public class Player extends BorderPane // Player class extend BorderPane
 
 
 
-		cMedBar = new MediaBar(this);
-		cCmdBar = new CmdBar(this);
-		cTopBox.getChildren().addAll(cCmdBar, cMedBar); // Setting the MediaBar at bottom 
+		cMedBar  = new MediaBar(this);
+		cInfoBar = new InfoBar(this);
+		cCmdBar  = new CmdBar(this);
+		cTopBox.getChildren().addAll(cCmdBar, cInfoBar, cMedBar); // Setting the MediaBar at bottom 
 		//		setStyle("-fx-background-color:#bfc2c7"); // Adding color to the mediabar 
 		setStyle("-fx-background-color:#bfc2c7"); // Adding color to the mediabar 
 		
@@ -235,7 +237,12 @@ public class Player extends BorderPane // Player class extend BorderPane
 		Conf.sBalance = iBal;
 		if( getPlayer() !=null )
 			getPlayer().setBalance( Conf.sBalance );		
-	}
+	}	
+	
+	
+	
+	
+
 	double getBalance() { return Conf.sBalance; }
 	//--------------------------------------
 	//--------------------------------------
@@ -268,7 +275,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 			sDir = cFileChooser.getInitialDirectory();		        
 			if (lFiles != null) { 
 				for( File lFile : lFiles) {					
-					cTableRecords.addFile(lFile );
+					cTableRecords.addFile(lFile, 0 );
 				}				
 				cTableRecords.writeSize2Foot("");
 				cTableRecords.save();				
@@ -290,7 +297,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 			// Choosing the file to play 
 			if (lFile != null) { 
 				//play( addFile2Records(lFile ) );
-				cTableRecords.addFile(lFile );
+				cTableRecords.addFile(lFile, 0 );
 				Platform.runLater(() -> { cTableRecords.save(); });
 				cTableRecords.writeSize2Foot("");
 			} 
@@ -301,6 +308,8 @@ public class Player extends BorderPane // Player class extend BorderPane
 	//--------------------------------------
 	public void clearAll() {
 		pause();
+		cMedPlayer.stop();
+		cMedPlayer.dispose();
 		cMedPlayer = null;
 		cTableRecords.clearAll();
 	}
@@ -310,10 +319,38 @@ public class Player extends BorderPane // Player class extend BorderPane
 		if( iRecord == null ) {
 			return;
 		} 
-
+		
 		URI iURI = iRecord.cURI;
 		try {
 			cMedia  = new Media(iURI.toURL().toExternalForm());
+			cCmdBar.setInfo( iRecord.getName());
+			
+			ObservableMap<String, Object> lMeta = cMedia.getMetadata();
+			
+			lMeta.addListener( (MapChangeListener.Change<? extends String, ? extends Object> chg) -> {
+//				StringBuilder lLabelTxt = new StringBuilder();				
+				String lArtist = (String) lMeta.get("artist");
+				String lAlbum  = (String) lMeta.get("album");
+				String lGenre  = (String) lMeta.get("genre");
+				String lTitle  = (String) lMeta.get("title");
+				Image lImage   = (Image) lMeta.get("image");
+				Log.Dbg( "Year:" + lMeta.get("year"));
+			//	String lYear      = (String) lMeta.get("year");
+
+				// "raw metadata"
+				/*
+				StringBuilder lLabelTxt = new StringBuilder();
+				lLabelTxt.append(System.lineSeparator());
+				for(String key : lMeta.keySet()) {
+					lLabelTxt.append(key);
+					lLabelTxt.append(": ");
+					lLabelTxt.append(lMeta.get(key));
+					lLabelTxt.append(System.lineSeparator());
+				}
+				*/
+				cInfoBar.setInfo(  lTitle,lArtist, lAlbum, lImage, lGenre );
+			});								
+
 		} catch (MalformedURLException e) {
 			iRecord.setError( Error.MALFORMED_URL, e.getMessage());
 			// TODO Auto-generated catch block
@@ -338,12 +375,10 @@ public class Player extends BorderPane // Player class extend BorderPane
 		}
 
 
-		//ObservableMap<String,Object> 	cMedia.getCssMetaData();
-		//ObservableList<Track> 	getTracks()
-
 		if( cMedPlayer != null){
 			cMedPlayer.stop();
-			//cMedPlayer.release();
+			cMedPlayer.dispose();
+			cMedPlayer = null;
 		}
 
 
@@ -366,14 +401,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 		lStr.append( cMedia.getWidth() );
 		lStr.append(  "x");
 		lStr.append( cMedia.getHeight() );
-		cCmdBar.setInfo( lStr.toString());
-/* A FAIRE il faudrait sauvegarder le Record courant dans le .ini - pour eviter une desyncro des fichiers
-		if( iPos != 0 ) {
-			Log.Dbg( "Play start=" + iPos  );
-			Duration lDur = new Duration( iPos );
-			cMedPlayer.setStartTime( lDur ); 
-		}
-		*/
+
 		cMedBar.newMedia();
 
 		if( iRecord.getExtension().equalsIgnoreCase("mp4") ) {
@@ -390,6 +418,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 			}
 		}
 
+		cCmdBar.play();
 		cMedPlayer.play();
 	} 
 	//--------------------------------------	
@@ -420,8 +449,8 @@ public class Player extends BorderPane // Player class extend BorderPane
 	public void play() {
 		
 		if( cMedPlayer != null ) {			
-			cMedPlayer.play();
 			cCmdBar.play();
+			cMedPlayer.play();
 		}else {
 			next();
 		}

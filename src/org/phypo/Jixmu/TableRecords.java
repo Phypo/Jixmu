@@ -18,8 +18,6 @@ import java.nio.file.Files;
 import org.phypo.PPg.PPgFX.AppliFx;
 import org.phypo.PPg.PPgFX.FxHelper;
 import org.phypo.PPg.PPgFX.TableFX;
-import org.phypo.PPg.PPgFX.TableFxHelper;
-
 import org.phypo.PPg.PPgUtils.Log;
 
 import javafx.application.Platform;
@@ -172,7 +170,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 
 		cPlayer = iPlayer;
 		setSelectionMode(SelectionMode.MULTIPLE);
-		addAutoMenu( MENU_SELECTION );
+//		addAutoMenu( MENU_SELECTION ); bug if too many lines !!!!!
 
 		TableColumn<MyRecord,String>     lColStr ;
 
@@ -198,9 +196,9 @@ public class TableRecords  extends  TableFX<MyRecord>{
 				List<File> lFiles = iEv.getDragboard().getFiles();
 				Log.Dbg("Got " + lFiles.size() + " files");		 
 				for( File lFile : lFiles ) {
-					addFile( lFile );
+					addFile( lFile, 0 );
 				}
-				TableFxHelper.AutoResizeColumns(TableRecords.this.getTableView());
+				autoResizeColumns();
 				
 				writeSize2Foot("");
 				Platform.runLater(() -> { save(); });
@@ -216,7 +214,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 			DirectoryStream<Path> lPaths = Files.newDirectoryStream( iFile.toPath() );
 			//		lPaths.forEach( lPath ->  addFile( lPath.toFile()) );
 			for( Path lPath : lPaths ) {
-				lRecord = addFile( lPath.toFile());
+				lRecord = addFile( lPath.toFile(), 0);
 			}
 
 		} catch (IOException e) {
@@ -227,10 +225,23 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	}
 	//--------------------------------------------
 	public MyRecord addFile( String iStr ) {
-		return addFile( new File( iStr ));
+		return addFile( new File( iStr), 0 );
 	}
 	//--------------------------------------------
-	public MyRecord addFile( File iFile ) {
+	public MyRecord addFile( String iStr, String lRand ) {
+	
+		if( lRand != null && lRand.length() > 0  ) {			
+			try {
+				long lRandNum = Long.parseLong( lRand );
+				return addFile( new File( iStr ), lRandNum );
+			}catch(Exception ex){
+			}
+		}
+			
+		return addFile( new File( iStr ), 0);
+	}
+	//--------------------------------------------
+	public MyRecord addFile( File iFile, long iRandom ) {
 		if( iFile.canRead() == false ) return null; 
 
 		if( iFile.isDirectory() ) 	return addDirectory( iFile );
@@ -251,7 +262,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 			return null;
 		}
 
-		MyRecord lRecord = new MyRecord( iFile );
+		MyRecord lRecord = new MyRecord( iFile, iRandom );
 		addLine( lRecord);	
 
 		return lRecord;
@@ -274,7 +285,8 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		Log.Dbg( "setRecordsMap " + iMap.cRecords.values().size() );		
 	}
 	 */
-	public boolean addPopupMenuItems( ContextMenu iMenu, MouseEvent iEv) {
+	@Override
+	public boolean addPopupMenuItems( ContextMenu iMenu, MouseEvent iEv, MyRecord iRecord, int iPosItem ) {
 		FxHelper.AddMenuItem( iMenu, "Remove selection", ( ActionEvent iAEv) -> {		
 
 				List<MyRecord> lList = removeAndGetAllSelectedLines();
@@ -288,6 +300,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		return true;
 	}
 	//-----------------------------
+	@Override
 	public void doubleClick( MouseEvent iEv, MyRecord iRecord, int iPosItem  ) {
 		if( setCurrentRecord( iRecord, iPosItem) != null )
 			cPlayer.play(iRecord, 0);
@@ -318,7 +331,8 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	final static String sPlayListSectionTag="[PLAYLIST]";  
 	final static String sCurrentTag="Current=";  
 	final static String sFilesTag="Files[]=";
-			
+	final static String sRandomSep=" : ";
+
 	//-----------------------------	
 	// A FAIRE : mettre des final String pour les chaines 
 
@@ -335,6 +349,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		iOut.println( sFilesTag ); 
 		ObservableList<MyRecord> lList = getContainer();
 		for( MyRecord lRecord : lList ) {
+			iOut.print( lRecord.cNumRandom + sRandomSep );
 			iOut.println( lRecord.getPath());
 		}
 		return true;
@@ -389,8 +404,15 @@ public class TableRecords  extends  TableFX<MyRecord>{
 					}
 				}
 				else {
-					Log.Dbg2("TableRecords read - Adding file:" + lStr );
-					addFile( lStr);
+					String lRand = null;
+					int lPos = lStr.indexOf( sRandomSep);
+					if( lPos != -1 ) {
+						lRand = lStr.substring( 0, lPos);
+						lStr = lStr.substring( lPos + sRandomSep.length() );
+					}
+					                 
+					Log.Dbg2("TableRecords read - Adding file:" + lStr + (lRand != null ? ":"+lRand : ""));
+					addFile( lStr, lRand);
 				}
 			}
 		} catch (IOException e) {

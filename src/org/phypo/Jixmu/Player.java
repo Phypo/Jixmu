@@ -11,6 +11,7 @@ import java.util.List;
 import org.phypo.PPg.PPgFX.FxHelper;
 import org.phypo.PPg.PPgUtils.Log;
 
+
 import javafx.scene.control.MenuBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane; 
@@ -18,8 +19,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.Track;
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -199,9 +202,9 @@ public class Player extends BorderPane // Player class extend BorderPane
 
 
 		cMedBar  = new MediaBar(this);
-		cInfoBar = new InfoBar(this);
-		cCmdBar  = new CmdBar(this);
-		cTopBox.getChildren().addAll(cCmdBar, cInfoBar, cMedBar); // Setting the MediaBar at bottom 
+		cCmdBar = new CmdBar(this);
+		cInfoBar = new InfoBar( cMedBar );
+		cTopBox.getChildren().addAll(cCmdBar, cInfoBar ); // Setting the MediaBar at bottom 
 		//		setStyle("-fx-background-color:#bfc2c7"); // Adding color to the mediabar 
 		setStyle("-fx-background-color:#bfc2c7"); // Adding color to the mediabar 
 		
@@ -324,9 +327,19 @@ public class Player extends BorderPane // Player class extend BorderPane
 		try {
 			cMedia  = new Media(iURI.toURL().toExternalForm());
 			cCmdBar.setInfo( iRecord.getName());
+			cInfoBar.setInfo( null , null, null, null, null );
+			
+	//		String lDuration = ((Double)cMedia.getDuration().toSeconds()).toString();
 			
 			ObservableMap<String, Object> lMeta = cMedia.getMetadata();
-			
+			ObservableList<Track> lTracks = cMedia.getTracks();
+			StringBuilder lStr = new StringBuilder();
+			for( Track lTrack : lTracks) {
+				lStr.append( lTrack.toString() );
+				lStr.append(" ");
+			}
+			cInfoBar.setTrack( lStr.toString());
+			 
 			lMeta.addListener( (MapChangeListener.Change<? extends String, ? extends Object> chg) -> {
 //				StringBuilder lLabelTxt = new StringBuilder();				
 				String lArtist = (String) lMeta.get("artist");
@@ -334,21 +347,14 @@ public class Player extends BorderPane // Player class extend BorderPane
 				String lGenre  = (String) lMeta.get("genre");
 				String lTitle  = (String) lMeta.get("title");
 				Image lImage   = (Image) lMeta.get("image");
-				Log.Dbg( "Year:" + lMeta.get("year"));
-			//	String lYear      = (String) lMeta.get("year");
-
-				// "raw metadata"
-				/*
-				StringBuilder lLabelTxt = new StringBuilder();
-				lLabelTxt.append(System.lineSeparator());
-				for(String key : lMeta.keySet()) {
-					lLabelTxt.append(key);
-					lLabelTxt.append(": ");
-					lLabelTxt.append(lMeta.get(key));
-					lLabelTxt.append(System.lineSeparator());
+				Integer lIntYear = (Integer)lMeta.get("year");
+				String lYear    = null;
+				if( lIntYear != null ) {
+					lYear = lIntYear.toString();
 				}
-				*/
-				cInfoBar.setInfo(  lTitle,lArtist, lAlbum, lImage, lGenre );
+				
+				cInfoBar.setInfo(  lTitle,lArtist, lAlbum, lYear,  lGenre );
+				cInfoBar.setImg(  lImage  );
 			});								
 
 		} catch (MalformedURLException e) {

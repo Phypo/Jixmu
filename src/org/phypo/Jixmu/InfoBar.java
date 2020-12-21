@@ -10,27 +10,38 @@ import javafx.scene.layout.VBox;
 
 public class InfoBar  extends HBox {
 	
-	VBox   cVBox       = new VBox();
-	
+	HBox   cBox       = new HBox();
+	VBox   cVBox      = new VBox();
+
 	Button cTitle      = new Button("Title ");
 	Button cArtist     = new Button("Artist");
 	Button cAlbum      = new Button("Album ");
-	
+	Button cYear       = new Button("Year ");
+	Button cTrack       = new Button("Track ");
+
 	int cImgSize  = 64;
 	Button cImg        = new Button("");
 
 	//----------------------------------------
-	InfoBar( Player iPlayer ){
-		getChildren().addAll( cImg, cVBox  );
-		cVBox.getChildren().addAll( cTitle,cArtist, cAlbum);	
+	InfoBar( MediaBar iBar ){
+		cBox.getChildren().addAll( cTitle,cArtist,cAlbum,cYear,cTrack);	
+		cVBox.getChildren().addAll( cBox, iBar);
+		getChildren().addAll( cImg,  cVBox );
 	}
 	//----------------------------------------
-	void setInfo( String iTitle, String iArtist, String iAlbum, Image iImg, String iGenre ) {
+	void setInfo( String iTitle, String iArtist, String iAlbum, String iYear,  String iGenre ) {
 			cTitle.setText(iTitle);
 			cArtist.setText(iArtist);
 			cAlbum.setText( iAlbum );
-			
-			cImgSize = (int) cVBox.getHeight();
+			cYear.setText( iYear );
+	}
+	//----------------------------------------
+	void setTrack( String iStr) {
+		cTrack.setText( iStr);
+	}
+	//----------------------------------------
+	void setImg(  Image iImg ) {
+			cImgSize = 64;
 			cImg.setMinHeight(cImgSize);
 			cImg.setMinWidth(cImgSize);
 			cImg.setMaxHeight(cImgSize);

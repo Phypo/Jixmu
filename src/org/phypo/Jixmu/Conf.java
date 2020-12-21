@@ -28,6 +28,8 @@ class Conf{
 	public static Image sIconeRepeatAll  = null;
 	public static Image sIconeRandom     = null;
 	public static Image sIconeMute       = null;
+	public static Image sIconeVolume     = null;
+	public static Image sIconeLR         = null;
 	public static Image sIconeDestroy    = null;
 	static String sGoodExtensions ="mp3 mp4";
 	
@@ -92,10 +94,12 @@ class Conf{
 		
 		if( OpenIni( args ) == false ) return false;
 
-		sIconeAppli     = FxHelper.ReadIcon(  sIniConf, "Application", "Icon",          null );	
+		sIconeAppli     = FxHelper.ReadIcon(  sIniConf, "APPLICATION", "Icon",          null );	
 		sIconeRepeatAll = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconRepeatAll", null );	
 		sIconeRandom    = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconRandom",    null );	
 		sIconeMute      = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconMute",      null );	
+		sIconeLR      = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconLR",      null );	
+		sIconeVolume      = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconVolume",      null );	
 
 		sIconeDestroy= FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconDestroy",      null );	
 		

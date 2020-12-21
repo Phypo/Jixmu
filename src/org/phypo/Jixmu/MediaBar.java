@@ -12,6 +12,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label; 
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox; 
 import javafx.scene.layout.Priority; 
 import javafx.scene.media.MediaPlayer; 
@@ -25,9 +27,12 @@ public class MediaBar extends HBox {
 	Slider cSliderBalance = new Slider(-1,1,0 );
 	
 	Button cPlayButton    = new Button("||"); 
-	Label  cLabelVolume   = new Label("Volume: "); 
-	Label  cLabelBalance  = new Label("Balance: "); 
+	Label  cLabelVolume   = new Label(""); 
+	Label  cLabelBalance  = new Label(""); 
+	Label  cLabelDuration = new Label("0000000"); 
+
 	Player cPlayer        = null;
+	
 	//--------------------------------------------------------------------------
 	public void newMedia( ) {
 		
@@ -93,29 +98,40 @@ public class MediaBar extends HBox {
 	        Conf.SaveIni();
 		});
 		
-		setAlignment(Pos.CENTER);
+	//	setAlignment(Pos.CENTER);
 
 		cPlayer = iPlayer;
 		
-		setAlignment(Pos.CENTER); // setting the HBox to center 
-		setPadding(new Insets(5, 10, 5, 10)); 
+	//	setAlignment(Pos.CENTER); // setting the HBox to center 
+		setPadding(new Insets(5, 5, 5, 5)); 
+
 		
 		cSliderVolume.setValue( cPlayer.getVolume() );
 		cSliderBalance.setValue(cPlayer.getBalance());
 
-		cSliderVolume.setPrefWidth(100); 
-		cSliderVolume.setMinWidth(30); 
-		
-		cSliderBalance.setPrefWidth(70); 
-		cSliderBalance.setMinWidth(30); 
+		cSliderTime.setMaxWidth(8000); 
+		cSliderTime.setPrefWidth(800); 
+		cSliderTime.setMinWidth(200); 
 
-		Label  cLabelBalance  = new Label("Balance: "); 
+		cSliderVolume.setMaxWidth(200); 
+		cSliderVolume.setPrefWidth(100); 
+		cSliderVolume.setMinWidth(80); 
+		
+		cSliderBalance.setMaxWidth(160); 
+		cSliderBalance.setPrefWidth(80); 
+		cSliderBalance.setMinWidth(50); 
+
+		cLabelBalance.setGraphic(new ImageView( Conf.sIconeLR));
+		cLabelVolume.setGraphic(new ImageView( Conf.sIconeVolume));
 
 		HBox.setHgrow(cSliderTime, Priority.ALWAYS); 
 //	cPlayButton.setPrefWidth(30); 
+		cLabelDuration.setMaxWidth(200); 
+		cLabelDuration.setPrefWidth(110); 
+		cLabelDuration.setMinWidth(80); 
 
 	//	getChildren().add(cPlayButton); // cPlayButton 
-		getChildren().addAll( lToggleM, lToggleR, lToggleA, cSliderTime, cLabelVolume, cSliderVolume, cLabelBalance, cSliderBalance);		
+		getChildren().addAll( lToggleM, lToggleR, lToggleA, cSliderTime, cLabelVolume, cSliderVolume, cLabelBalance, cSliderBalance, cLabelDuration);		
 	} 
 	//--------------------------------------------------------------------------
 	protected void updatesValues() {	
@@ -132,6 +148,7 @@ public class MediaBar extends HBox {
 						
 						cSliderTime.setValue(  lPosition );
 						Conf.sCurrentMediaTime = lCurrent;
+						cLabelDuration.setText( (int)(lCurrent/1000) + "/" + (int)(lTotal/1000)+ "s" );
 					}
 			}); 
 		} 

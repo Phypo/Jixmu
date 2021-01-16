@@ -1,6 +1,8 @@
 package org.phypo.Jixmu;
 
 
+import java.awt.Font;
+
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -27,6 +29,7 @@ public class InfoBar  extends HBox {
 		cBox.getChildren().addAll( cTitle,cArtist,cAlbum,cYear,cTrack);	
 		cVBox.getChildren().addAll( cBox, iBar);
 		getChildren().addAll( cImg,  cVBox );
+		cTitle.setStyle("-fx-font-size:18");
 	}
 	//----------------------------------------
 	void setInfo( String iTitle, String iArtist, String iAlbum, String iYear,  String iGenre ) {

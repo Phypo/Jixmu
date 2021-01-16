@@ -27,6 +27,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
@@ -41,7 +42,16 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	//--------------------------------------------
 	//int      cCurrentRecordPos = -1;
 	MyRecord cCurrentRecord = null;
-
+	//-----------------------------
+	TableRecords(){
+		setOnKeyPressed(ke -> {
+       KeyCode lKeyCode = ke.getCode();
+		Log.Info( lKeyCode.toString());
+		if (lKeyCode.equals(KeyCode.DELETE)) {            
+				removeSelection();			
+			}
+		});
+	}
 	//-----------------------------
 	@Override
 	public MyRecord addLine( MyRecord iObj ) {
@@ -285,17 +295,21 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		Log.Dbg( "setRecordsMap " + iMap.cRecords.values().size() );		
 	}
 	 */
+	//-------------------------------------------
+	void removeSelection() {
+		List<MyRecord> lList = removeAndGetAllSelectedLines();
+		for( MyRecord lFind : lList ) {
+			if( lFind != null ) {
+				Log.Dbg( "addPopupMenuItems Remove line :" + lFind.getPath() );
+				removeRecord(  lFind, false );
+			}
+		}
+	}
+	//--------------------------------------------
 	@Override
 	public boolean addPopupMenuItems( ContextMenu iMenu, MouseEvent iEv, MyRecord iRecord, int iPosItem ) {
 		FxHelper.AddMenuItem( iMenu, "Remove selection", ( ActionEvent iAEv) -> {		
-
-				List<MyRecord> lList = removeAndGetAllSelectedLines();
-				for( MyRecord lFind : lList ) {
-					if( lFind != null ) {
-						Log.Dbg( "addPopupMenuItems Remove line :" + lFind.getPath() );
-						removeRecord(  lFind, false );
-					}
-				}
+			removeSelection();			
 		});
 		return true;
 	}

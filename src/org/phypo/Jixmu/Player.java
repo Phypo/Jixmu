@@ -14,6 +14,7 @@ import org.phypo.PPg.PPgUtils.Log;
 
 import javafx.scene.control.MenuBar;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane; 
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
@@ -74,7 +75,10 @@ public class Player extends BorderPane // Player class extend BorderPane
 
 	//--------------------------------------
 	public Player() {
-
+		
+	
+	
+		    
 		cTopBox = new VBox(2);
 		setTop(cTopBox);  
 
@@ -352,6 +356,8 @@ public class Player extends BorderPane // Player class extend BorderPane
 				if( lIntYear != null ) {
 					lYear = lIntYear.toString();
 				}
+				
+				Main.Instance().getPrimStage().setTitle( lTitle +'|'+ lArtist+'|'+lAlbum+'|'+ lYear+'|'+  lGenre);
 				
 				cInfoBar.setInfo(  lTitle,lArtist, lAlbum, lYear,  lGenre );
 				cInfoBar.setImg(  lImage  );

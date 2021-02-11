@@ -7,12 +7,10 @@ import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets; 
-import javafx.geometry.Pos;
 import javafx.scene.control.Button; 
 import javafx.scene.control.Label; 
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox; 
 import javafx.scene.layout.Priority; 
@@ -36,7 +34,7 @@ public class MediaBar extends HBox {
 	//--------------------------------------------------------------------------
 	public void newMedia( ) {
 		
-		cSliderVolume.setValue( cPlayer.getVolume() );
+		cSliderVolume.setValue( Math.sqrt(cPlayer.getVolume()) );
 		cSliderBalance.setValue(cPlayer.getBalance());
 
 		cPlayer.getPlayer().currentTimeProperty().addListener( (Observable ov) -> { 
@@ -55,7 +53,7 @@ public class MediaBar extends HBox {
 
 		cSliderVolume.valueProperty().addListener((Observable ov)-> { 
 				if (cSliderVolume.isPressed()) { 
-					cPlayer.setVolume(cSliderVolume.getValue()); 
+					cPlayer.setVolume(cSliderVolume.getValue()*cSliderVolume.getValue()); 
 			        Conf.SaveIni();
 					Platform.runLater(new Runnable() { public void run() { Conf.SaveIni();}});
 				} 
@@ -106,7 +104,7 @@ public class MediaBar extends HBox {
 		setPadding(new Insets(5, 5, 5, 5)); 
 
 		
-		cSliderVolume.setValue( cPlayer.getVolume() );
+		cSliderVolume.setValue( Math.sqrt(cPlayer.getVolume()));
 		cSliderBalance.setValue(cPlayer.getBalance());
 
 		cSliderTime.setMaxWidth(8000); 

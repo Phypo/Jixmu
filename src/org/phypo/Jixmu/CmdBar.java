@@ -20,6 +20,7 @@ public class CmdBar extends HBox {
 	Button cNextButton      = new Button(">>|"); 
 	Button cDestroyButton   = new Button(""); 
 	Button cInfoMedia       = new Button("");
+	Button cCopyBestOF      = null;
 
 	
 	Player cPlayer = null;
@@ -27,10 +28,19 @@ public class CmdBar extends HBox {
 	//--------------------------------------------------------------------------
 
 	public CmdBar( Player iPlayer  ) {
-		cPlayer = iPlayer;
+		cPlayer = iPlayer;		
+
+		if( Conf.sDirCopyBestOf != null && Conf.sDirCopyBestOf.length()>0) {
+			cCopyBestOF = new Button("");
+			cCopyBestOF.setPrefWidth(60); 
+			cCopyBestOF.setMinWidth(50); 
+			FxHelper.SetButtonImage( cCopyBestOF, Conf.sIconeCpy2BestOf );
+			cCopyBestOF.setOnAction( (ActionEvent e) -> { cPlayer.copyCurrent2BestOf(); });
+			getChildren().add(cCopyBestOF);
+		}
 		
-		getChildren().addAll(  cPreviousButton, cPlayButton, cNextButton, cInfoMedia, cDestroyButton );
-		
+		getChildren().addAll( cPreviousButton, cPlayButton, cNextButton, cInfoMedia, cDestroyButton);
+	
 		cPlayButton.setPrefWidth(40); 
 		cPlayButton.setMinWidth(40); 
 

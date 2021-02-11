@@ -81,7 +81,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	MyRecord setCurrentRecord( MyRecord iRecord, int iPosItem ) {
 		if( iRecord == null ) {
 			if( iPosItem == -1 ) {
-				if( size() > 0 ) {
+				if( realSize() > 0 ) {
 					iPosItem = 0;
 					iRecord = getItem( 0);
 				}
@@ -159,7 +159,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 			int lCurrentRecordPos = getIndexOf( cCurrentRecord); // il peut y avoir eu des sorts ou autre //Lent?
 			MyRecord lRecord = getItem( lCurrentRecordPos-1 );
 			if( lRecord == null ) {
-				lRecord = getItem( size()-1 ); // la fin
+				lRecord = getItem( realSize()-1 ); // la fin
 			}
 			return setCurrentRecord( lRecord, lCurrentRecordPos-1);
 		} 
@@ -285,7 +285,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		if( iFlagAlsoLine) {
 			removeObject( lRecord);
 		}
-		Log.Dbg( "lines:" + size() + " Records:" + cRecords.size()+ "Randoms:" + cRandoms.size());
+		Log.Dbg( "lines:" + realSize() + " Records:" + cRecords.size()+ "Randoms:" + cRandoms.size());
 	}
 	/*
 	//--------------------------------------------
@@ -317,7 +317,9 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	@Override
 	public void doubleClick( MouseEvent iEv, MyRecord iRecord, int iPosItem  ) {
 		if( setCurrentRecord( iRecord, iPosItem) != null )
-			cPlayer.play(iRecord, 0);
+			if( cPlayer.play(iRecord, 0) == false ) {
+				cPlayer.next();
+			}
 	}
 	//-----------------------------
 	//-----------------------------
@@ -373,7 +375,12 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	boolean readPlayList(String iFilename, boolean iFlagReadCurrent ) {
 		if( iFilename == null || iFilename.length() == 0)
 			return false;
+		
 		File lFile= new File( iFilename );
+		if( lFile.exists() == false ) {
+			return false;
+		}
+			
 		return readPlayList( lFile, iFlagReadCurrent);	
 	}
 	//-----------------------------	

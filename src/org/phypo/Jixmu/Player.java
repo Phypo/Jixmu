@@ -12,9 +12,15 @@ import org.phypo.PPg.PPgFX.FxHelper;
 import org.phypo.PPg.PPgUtils.Log;
 
 
+import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 import javafx.scene.control.MenuBar;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane; 
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
@@ -44,7 +50,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 	FileChooser      cFileChooser     = null; 
 	DirectoryChooser cDirChooser      = null; 
 	String           cCurrentPlayList = "Default.jixmu";
-	
+
 	public enum Error { NO_ERROR, MEDIAPLAYER, MALFORMED_URL, MEDIA_UNSUPPORTED, MEDIA_ERROR};
 
 
@@ -75,10 +81,8 @@ public class Player extends BorderPane // Player class extend BorderPane
 
 	//--------------------------------------
 	public Player() {
-		
-	
-	
-		    
+
+
 		cTopBox = new VBox(2);
 		setTop(cTopBox);  
 
@@ -182,13 +186,13 @@ public class Player extends BorderPane // Player class extend BorderPane
 				//setCenter(null);
 				getTop().setManaged(false);
 				cTableRecords.setManaged(false);
-		//		Main.Instance().cStage.sizeToScene();
+				//		Main.Instance().cStage.sizeToScene();
 			} else {
 				cTableRecords.setVisible(true);					
 				cTableRecords.setManaged(true);
 				getTop().setManaged(true);
-		//		Main.Instance().cStage.sizeToScene();
-			//setCenter( cTableRecords );
+				//		Main.Instance().cStage.sizeToScene();
+				//setCenter( cTableRecords );
 			}
 		});
 
@@ -211,9 +215,11 @@ public class Player extends BorderPane // Player class extend BorderPane
 		cTopBox.getChildren().addAll(cCmdBar, cInfoBar ); // Setting the MediaBar at bottom 
 		//		setStyle("-fx-background-color:#bfc2c7"); // Adding color to the mediabar 
 		setStyle("-fx-background-color:#bfc2c7"); // Adding color to the mediabar 
-		
-		if( Conf.sAutoPlay) {
-			play( cTableRecords.getCurrentRecord(), Conf.sCurrentMediaTime );
+
+		if( Conf.sAutoPlay ) {
+			if( play( cTableRecords.getCurrentRecord(), Conf.sCurrentMediaTime ) == false ) {
+				//next();
+			}
 		}
 
 	}
@@ -245,10 +251,10 @@ public class Player extends BorderPane // Player class extend BorderPane
 		if( getPlayer() !=null )
 			getPlayer().setBalance( Conf.sBalance );		
 	}	
-	
-	
-	
-	
+
+
+
+
 
 	double getBalance() { return Conf.sBalance; }
 	//--------------------------------------
@@ -321,20 +327,20 @@ public class Player extends BorderPane // Player class extend BorderPane
 		cTableRecords.clearAll();
 	}
 	//--------------------------------------
-	public void play( MyRecord iRecord, double iPos ) {
-	
+	public boolean play( MyRecord iRecord, double iPos ) {
+
 		if( iRecord == null ) {
-			return;
+			return false;
 		} 
-		
+
 		URI iURI = iRecord.cURI;
 		try {
 			cMedia  = new Media(iURI.toURL().toExternalForm());
 			cCmdBar.setInfo( iRecord.getName());
 			cInfoBar.setInfo( null , null, null, null, null );
-			
-	//		String lDuration = ((Double)cMedia.getDuration().toSeconds()).toString();
-			
+
+			//		String lDuration = ((Double)cMedia.getDuration().toSeconds()).toString();
+
 			ObservableMap<String, Object> lMeta = cMedia.getMetadata();
 			ObservableList<Track> lTracks = cMedia.getTracks();
 			StringBuilder lStr = new StringBuilder();
@@ -343,9 +349,9 @@ public class Player extends BorderPane // Player class extend BorderPane
 				lStr.append(" ");
 			}
 			cInfoBar.setTrack( lStr.toString());
-			 
+
 			lMeta.addListener( (MapChangeListener.Change<? extends String, ? extends Object> chg) -> {
-//				StringBuilder lLabelTxt = new StringBuilder();				
+				//				StringBuilder lLabelTxt = new StringBuilder();				
 				String lArtist = (String) lMeta.get("artist");
 				String lAlbum  = (String) lMeta.get("album");
 				String lGenre  = (String) lMeta.get("genre");
@@ -356,9 +362,9 @@ public class Player extends BorderPane // Player class extend BorderPane
 				if( lIntYear != null ) {
 					lYear = lIntYear.toString();
 				}
-				
+
 				Main.Instance().getPrimStage().setTitle( lTitle +'|'+ lArtist+'|'+lAlbum+'|'+ lYear+'|'+  lGenre);
-				
+
 				cInfoBar.setInfo(  lTitle,lArtist, lAlbum, lYear,  lGenre );
 				cInfoBar.setImg(  lImage  );
 			});								
@@ -367,23 +373,26 @@ public class Player extends BorderPane // Player class extend BorderPane
 			iRecord.setError( Error.MALFORMED_URL, e.getMessage());
 			// TODO Auto-generated catch block
 			String lErr = e.getMessage();
-			Alert lAlert = new Alert(AlertType.ERROR, lErr );
-			lAlert.showAndWait();	   
-			return;
+			Log.Err( "Error.MALFORMED_URL - " + lErr );
+			//	Alert lAlert = new Alert(AlertType.ERROR, lErr );
+			//lAlert.showAndWait();	   
+			return false;
 		}
 		catch (MediaException e ){
 			iRecord.setError( Error.MEDIA_UNSUPPORTED, e.getMessage());
 			String lErr = e.getMessage();
-			Alert lAlert = new Alert(AlertType.ERROR, lErr );
-			lAlert.showAndWait();	   
-			return ;
+			Log.Err( "Error.MEDIA_UNSUPPORTED - " + lErr );
+			//		Alert lAlert = new Alert(AlertType.ERROR, lErr );
+			//		lAlert.showAndWait();	   
+			return false;
 		}
 		catch (Exception e ){
 			iRecord.setError( Error.MEDIA_ERROR, e.getMessage());
 			String lErr = e.getMessage();
-			Alert lAlert = new Alert(AlertType.ERROR, lErr );
-			lAlert.showAndWait();	   		
-			return ;
+			Log.Err( "Error.MEDIA_ERROR - " + lErr );
+			//	Alert lAlert = new Alert(AlertType.ERROR, lErr );
+			//	lAlert.showAndWait();	   		
+			return false;
 		}
 
 
@@ -432,6 +441,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 
 		cCmdBar.play();
 		cMedPlayer.play();
+		return true;
 	} 
 	//--------------------------------------	
 	public void destroyCurrent() {
@@ -440,9 +450,33 @@ public class Player extends BorderPane // Player class extend BorderPane
 		cTableRecords.writePlaylist( cCurrentPlayList, false);
 	}
 	//--------------------------------------	
+	public void copyCurrent2BestOf() {
+		if( Conf.sDirCopyBestOf == null || Conf.sDirCopyBestOf.length()<1) {
+			Log.Err("No current record");
+			return;
+		}
+		MyRecord lRecord = cTableRecords.getCurrentRecord();
+		
+		if( lRecord != null ) {		
+			try {
+				Path lSrc  = Paths.get( lRecord.getPath() );//lSrc.getFileName()
+				Path lDest = Paths.get( Conf.sDirCopyBestOf ).resolve(lSrc.getFileName());
+				
+		//		Log.Info("Copy " + lSrc + " -> " + lDest);
+				
+				Files.copy( lSrc, lDest, StandardCopyOption.REPLACE_EXISTING  ); //.resolve( lSrc.getFileName()));
+			
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				
+		}
+	}
+	//--------------------------------------	
 	public void scrollToCurrent() {
 		cTableRecords.scrollToItem( cTableRecords.getCurrentRecord());
-		
+
 	}
 	//--------------------------------------	
 	public void mute() {
@@ -459,7 +493,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 	}
 	//--------------------------------------	
 	public void play() {
-		
+
 		if( cMedPlayer != null ) {			
 			cCmdBar.play();
 			cMedPlayer.play();
@@ -469,35 +503,35 @@ public class Player extends BorderPane // Player class extend BorderPane
 	}
 	//--------------------------------------	
 	public void next() {	
-		
-		boolean oFlagStop = false;
-		MyRecord lRecord = null;		
-		lRecord = cTableRecords.getNextRecord(oFlagStop);		
 
-		if( Conf.sRepeatAll == false  && oFlagStop == true)
-			return ;
-		
-		if( lRecord != null && lRecord.onError() == false ) {
-				play( lRecord, 0 );
-				return;
+		while( true ) {
+			boolean oFlagStop = false;
+			MyRecord lRecord = null;		
+			lRecord = cTableRecords.getNextRecord(oFlagStop);		
+
+			if( Conf.sRepeatAll == false  && oFlagStop == true)
+				break ;
+
+			if( lRecord == null || lRecord.onError() 
+					|| play( lRecord, 0 ) == false ) {
+				continue;
+			}
+			break;	
 		}
-//		else {
-	//		next();
-	//	}
 	}
 	//--------------------------------------	
 	public void previous() {
 		MyRecord lRecord = null;
 
 		lRecord = cTableRecords.getPreviousRecord();
-			
+
 		if( lRecord != null && lRecord.onError() == false) {
-				play( lRecord, 0 );
-				return;
-			}
-	//	else {
-	//		previous();
-	//	}
+			play( lRecord, 0 );	 
+			return;
+		}
+		//	else {
+		//		previous();
+		//	}
 	}
 	//--------------------------------------	
 	public void endOfTrack() {

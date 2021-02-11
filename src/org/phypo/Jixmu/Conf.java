@@ -30,6 +30,8 @@ class Conf{
 	public static Image sIconeMute       = null;
 	public static Image sIconeVolume     = null;
 	public static Image sIconeLR         = null;
+	
+	public static Image sIconeCpy2BestOf = null;
 	public static Image sIconeDestroy    = null;
 	static String sGoodExtensions ="mp3 mp4";
 	
@@ -45,6 +47,8 @@ class Conf{
 	
 	public static double sCurrentMediaTime = 0;
 
+	public static String sDirCopyBestOf=null;
+	
 
 	//------------------------------------------------
 	public static boolean OpenIni( String[] args){
@@ -98,8 +102,10 @@ class Conf{
 		sIconeRepeatAll = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconRepeatAll", null );	
 		sIconeRandom    = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconRandom",    null );	
 		sIconeMute      = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconMute",      null );	
-		sIconeLR      = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconLR",      null );	
-		sIconeVolume      = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconVolume",      null );	
+		sIconeLR         = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconLR",      null );	
+		sIconeVolume     = FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconVolume",      null );	
+
+		sIconeCpy2BestOf= FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconCopyBestOf",      null );	
 
 		sIconeDestroy= FxHelper.ReadIcon(  sIniConf, "ICONES",      "IconDestroy",      null );	
 		
@@ -110,11 +116,11 @@ class Conf{
 				
 		sBalance = sIniConf.getdouble( "USER_SETTINGS", "Balance", sBalance);
 		sVolume  = sIniConf.getdouble( "USER_SETTINGS", "Volume", sVolume);
-		
-		sCurrentMediaTime  = sIniConf.getdouble( "USER_SETTINGS", "CurrentMediaTime", sVolume);
+	
+		sDirCopyBestOf = sIniConf.get("USER_SETTINGS", "DirCopyBestOf", null );
 
 		
-		
+		sCurrentMediaTime  = sIniConf.getdouble( "USER_SETTINGS", "CurrentMediaTime", sVolume);
 		String lStr = sIniConf.get( "FILES", "GoodExtensions", sGoodExtensions );
 		Log.Dbg( "Extensions Str:" + lStr );
 		

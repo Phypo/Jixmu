@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 
+import org.phypo.PPg.PPgFX.DataViewObj;
 import org.phypo.PPg.PPgUtils.Log;
 
 
 //***********************************
-public class MyRecord {
+public class MyRecord implements DataViewObj{
 
 	static protected   long    sCurrentNumOrder=1;
 
@@ -76,6 +77,20 @@ public class MyRecord {
 		this( iFile, 0);	
 	}	
 	//----------------------------
+	void set( MyRecord iObj ) {
+		cNumOrder  = iObj.cNumOrder;
+		cNumRandom = iObj.cNumRandom;
+		cURI       = iObj.cURI;
+		cPath      = iObj.cPath;
+		cName      = iObj.cName;
+		cInfo      = iObj. cInfo;
+		cSize      = iObj.cSize;
+		cExtension = iObj. cExtension;
+		cError     = iObj.cError;
+		cStrError  = iObj.cStrError;  
+	
+	}
+	//----------------------------
 	public MyRecord( File iFile, long iRandom  ) { //URI iUri) {
 
 		if( iRandom == 0) {
@@ -105,6 +120,19 @@ public class MyRecord {
 			e.printStackTrace();
 		}
 		Log.Dbg2( "MyRecord URI:" + cURI) ;
+	}
+	//----------------------------
+	@Override
+	public String getObjName() {
+		return "Record";
+	}
+	@Override
+	public Long getKey() {
+		return cNumOrder;
+	}
+	@Override
+	public void setFrom(DataViewObj iObj) {
+		set( (MyRecord) iObj);		
 	}	  
 
 	//----------------------------

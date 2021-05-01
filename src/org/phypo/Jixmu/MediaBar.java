@@ -30,7 +30,12 @@ public class MediaBar extends HBox {
 	Label  cLabelDuration = new Label("0000000"); 
 
 	Player cPlayer        = null;
-	
+	//--------------------------------------------------------------------------
+	void setVolume( double iVol ) {
+		if( iVol >= 0 && iVol <= 1 ) {
+			cSliderVolume.setValue(iVol);
+		}
+	}
 	//--------------------------------------------------------------------------
 	public void newMedia( ) {
 		
@@ -52,7 +57,8 @@ public class MediaBar extends HBox {
 		}); 
 
 		cSliderVolume.valueProperty().addListener((Observable ov)-> { 
-				if (cSliderVolume.isPressed()) { 
+		//		if (cSliderVolume.isPressed()) {
+			{
 					cPlayer.setVolume(cSliderVolume.getValue()*cSliderVolume.getValue()); 
 			        Conf.SaveIni();
 					Platform.runLater(new Runnable() { public void run() { Conf.SaveIni();}});
@@ -68,6 +74,8 @@ public class MediaBar extends HBox {
 				} 
 		}); 
 	}
+	//--------------------------------------------------------------------------
+	double getVolume() { return cSliderVolume.getValue(); }
 	//--------------------------------------------------------------------------
 	public MediaBar(Player iPlayer ) {
 		

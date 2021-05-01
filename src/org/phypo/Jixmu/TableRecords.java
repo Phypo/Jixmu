@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,22 +18,24 @@ import java.nio.file.Files;
 
 import org.phypo.PPg.PPgFX.AppliFx;
 import org.phypo.PPg.PPgFX.FxHelper;
-import org.phypo.PPg.PPgFX.TableFX;
+import org.phypo.PPg.PPgFX.TableViewFX;
 import org.phypo.PPg.PPgUtils.Log;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
 //***********************************
-public class TableRecords  extends  TableFX<MyRecord>{
+public class TableRecords  extends  TableViewFX<Long, MyRecord>{
 
 
 	Player      cPlayer=null;
@@ -44,13 +47,6 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	MyRecord cCurrentRecord = null;
 	//-----------------------------
 	TableRecords(){
-		setOnKeyPressed(ke -> {
-       KeyCode lKeyCode = ke.getCode();
-		Log.Info( lKeyCode.toString());
-		if (lKeyCode.equals(KeyCode.DELETE)) {            
-				removeSelection();			
-			}
-		});
 	}
 	//-----------------------------
 	@Override
@@ -81,7 +77,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 	MyRecord setCurrentRecord( MyRecord iRecord, int iPosItem ) {
 		if( iRecord == null ) {
 			if( iPosItem == -1 ) {
-				if( realSize() > 0 ) {
+				if( filterSize() > 0 ) {
 					iPosItem = 0;
 					iRecord = getItem( 0);
 				}
@@ -159,7 +155,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 			int lCurrentRecordPos = getIndexOf( cCurrentRecord); // il peut y avoir eu des sorts ou autre //Lent?
 			MyRecord lRecord = getItem( lCurrentRecordPos-1 );
 			if( lRecord == null ) {
-				lRecord = getItem( realSize()-1 ); // la fin
+				lRecord = getItem( filterSize()-1 ); // la fin
 			}
 			return setCurrentRecord( lRecord, lCurrentRecordPos-1);
 		} 
@@ -194,7 +190,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		lColStr = addColumn( "Error",        "StrError");		
 
 
-		setOnDragOver( (DragEvent iEv) -> {
+		getPane().setOnDragOver( (DragEvent iEv) -> {
 				Log.Dbg("setOnDragOver");		      		         
 				if (iEv.getDragboard().hasFiles()) {
 					iEv.acceptTransferModes(TransferMode.ANY); 
@@ -202,7 +198,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 				iEv.consume();
 		});
 
-		setOnDragDropped( (DragEvent iEv) -> {
+		getPane().setOnDragDropped( (DragEvent iEv) -> {
 				List<File> lFiles = iEv.getDragboard().getFiles();
 				Log.Dbg("Got " + lFiles.size() + " files");		 
 				for( File lFile : lFiles ) {
@@ -215,6 +211,52 @@ public class TableRecords  extends  TableFX<MyRecord>{
 				
 				iEv.consume();
 		});
+		
+		
+		
+		getTableView().addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent iKeyEvent) {
+          
+            		Log.Info( "Key:" + iKeyEvent.getCode() + " " + iKeyEvent.getCode().toString() );
+            	
+            	switch(iKeyEvent.getCode()  ) {
+				case ESCAPE:
+					cPlayer.pause();
+					break;
+					
+            	case DELETE :
+            	case BACK_SPACE:removeSelection(); break;
+            	
+            	case DIGIT4:
+				case NUMPAD4:
+				case LEFT:  cPlayer.previous();    break;
+            	
+            	case DIGIT6:
+				case NUMPAD6:
+            	case RIGHT: cPlayer.next();        break;
+            	
+				case VOLUME_UP:
+            	case ADD:   cPlayer.cMedBar.setVolume(cPlayer.cMedBar.getVolume()*1.05);
+            	Log.Info("+++");
+            		break;
+            	
+				case VOLUME_DOWN:
+				case MINUS:
+				case SUBTRACT: cPlayer.cMedBar.setVolume(cPlayer.cMedBar.getVolume()*0.95);
+            	Log.Info("---");
+					break;
+           	
+            	case ENTER:
+            		ObservableList<MyRecord> lList = getSelectedItems();
+            		if( lList.size() > 0 ){            	
+            			cPlayer.play( lList.get(0), 0 );
+            		}
+					break;
+            	}
+            }
+        });
+
 	}
 	//--------------------------------------------
 	public MyRecord addDirectory( File iFile ) {
@@ -285,7 +327,7 @@ public class TableRecords  extends  TableFX<MyRecord>{
 		if( iFlagAlsoLine) {
 			removeObject( lRecord);
 		}
-		Log.Dbg( "lines:" + realSize() + " Records:" + cRecords.size()+ "Randoms:" + cRandoms.size());
+		Log.Dbg( "lines:" + filterSize() + " Records:" + cRecords.size()+ "Randoms:" + cRandoms.size());
 	}
 	/*
 	//--------------------------------------------

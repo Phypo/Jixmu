@@ -12,7 +12,6 @@ import org.phypo.PPg.PPgFX.FxHelper;
 import org.phypo.PPg.PPgUtils.Log;
 
 
-import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,8 +86,8 @@ public class Player extends BorderPane // Player class extend BorderPane
 		setTop(cTopBox);  
 
 		cTableRecords = new TableRecords( Player.this );
-		cTableRecords.setVisible(false);					
-		setCenter( cTableRecords );
+		cTableRecords.getPane().setVisible(false);					
+		setCenter( cTableRecords.getPane());
 
 		// ==== Menu =====
 		cMenu              = new MenuBar(); 
@@ -171,8 +170,8 @@ public class Player extends BorderPane // Player class extend BorderPane
 		});
 
 		cTableRecords = new TableRecords(this);
-		cTableRecords.setVisible(true);					
-		setCenter( cTableRecords );
+		cTableRecords.getPane().setVisible(true);					
+		setCenter( cTableRecords.getPane() );
 
 
 		cTableRecords.load();
@@ -181,15 +180,15 @@ public class Player extends BorderPane // Player class extend BorderPane
 		cMenu.getMenus().add(lMenuView); 
 
 		FxHelper.AddMenuItem( lMenuView, "Records", (ActionEvent e) -> {
-			if( cTableRecords.isVisible() ) {
-				cTableRecords.setVisible(false);
+			if( cTableRecords.getPane().isVisible() ) {
+				cTableRecords.getPane().setVisible(false);
 				//setCenter(null);
 				getTop().setManaged(false);
-				cTableRecords.setManaged(false);
+				cTableRecords.getPane().setManaged(false);
 				//		Main.Instance().cStage.sizeToScene();
 			} else {
-				cTableRecords.setVisible(true);					
-				cTableRecords.setManaged(true);
+				cTableRecords.getPane().setVisible(true);					
+				cTableRecords.getPane().setManaged(true);
 				getTop().setManaged(true);
 				//		Main.Instance().cStage.sizeToScene();
 				//setCenter( cTableRecords );
@@ -197,8 +196,8 @@ public class Player extends BorderPane // Player class extend BorderPane
 		});
 
 		cTableRecords = new TableRecords(this);
-		cTableRecords.setVisible(true);					
-		setCenter( cTableRecords );
+		cTableRecords.getPane().setVisible(true);					
+		setCenter( cTableRecords.getPane());
 
 
 		cTableRecords.load();
@@ -349,6 +348,9 @@ public class Player extends BorderPane // Player class extend BorderPane
 				lStr.append(" ");
 			}
 			cInfoBar.setTrack( lStr.toString());
+			
+			Main.Instance().getPrimStage().setTitle( lStr.toString());
+			cInfoBar.setInfo(  lStr.toString(),"", "", "",  "" );
 
 			lMeta.addListener( (MapChangeListener.Change<? extends String, ? extends Object> chg) -> {
 				//				StringBuilder lLabelTxt = new StringBuilder();				
@@ -363,7 +365,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 					lYear = lIntYear.toString();
 				}
 
-				Main.Instance().getPrimStage().setTitle( lTitle +'|'+ lArtist+'|'+lAlbum+'|'+ lYear+'|'+  lGenre);
+				Main.Instance().getPrimStage().setTitle( lTitle +" - "+ lArtist+" - "+lAlbum+" - "+ lYear+" - "+  lGenre);
 
 				cInfoBar.setInfo(  lTitle,lArtist, lAlbum, lYear,  lGenre );
 				cInfoBar.setImg(  lImage  );

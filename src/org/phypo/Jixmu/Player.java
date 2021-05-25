@@ -144,8 +144,7 @@ public class Player extends BorderPane // Player class extend BorderPane
 					e1.printStackTrace();
 				}
 				if( lName == null ) {
-					Alert lAlert = new Alert(AlertType.ERROR, "Bad file name" );
-					lAlert.showAndWait();	   
+					FxHelper.MsgErrWait( "Bad file name" );
 					return;
 				}
 				lName += ".jixmu";
